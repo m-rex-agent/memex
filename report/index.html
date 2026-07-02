@@ -1,21 +1,29 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Report a problem — memex</title><link rel="stylesheet" href="../_style.css">
-</head><body><main>
-<div class="card">
-  <h1>Report a <span class="accent">memex</span> problem</h1>
-  <p class="sub">Describe what happened. If the app showed error details ("Show details"), paste them — they make the difference.</p>
-  <form action="https://script.google.com/macros/s/AKfycbyNa94d2YLzZghiIfJ8LkhtXWBf4WaX1fVcHbEEOk0iFVN-GbZC0hKZ2QjmGMU4pYfn/exec" method="POST">
-    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <label for="what">What happened?</label>
-    <input id="what" name="what" required placeholder="e.g. The local server couldn't start after an update">
-    <label for="details">Error details (paste from “Show details”)</label>
-    <textarea id="details" name="details" placeholder="Paste the captured error text here"></textarea>
-    <label for="contact">Your email (optional — only if you want a reply)</label>
-    <input id="contact" name="contact" type="email" placeholder="you@example.com">
-    <div style="margin-top:18px"><button class="btn" type="submit">Send report</button></div>
-  </form>
-</div>
-<footer><a class="quiet" href="../">memex</a></footer>
-</main></body></html>
+<title>Report a problem — memex</title>
+<link rel="stylesheet" href="../style.css">
+</head><body>
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" fill="#3b82f6"/></svg>
+  <a class="brand" href="../"><span>memex</span> helm</a><span class="crumb">report</span>
+</header>
+<main>
+  <div class="card">
+    <div class="kicker">problem report</div>
+    <h1>Something broke. Tell us how.</h1>
+    <p class="lede">Describe what happened. If the app showed error details ("Show details"), paste them below — they make the difference.</p>
+    <form action="https://script.google.com/macros/s/AKfycbyNa94d2YLzZghiIfJ8LkhtXWBf4WaX1fVcHbEEOk0iFVN-GbZC0hKZ2QjmGMU4pYfn/exec" method="POST">
+      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label for="what">What happened?</label>
+      <input id="what" name="what" required maxlength="2000" placeholder="e.g. The local server couldn't start after an update">
+      <label for="details">Error details <small>— paste from “Show details”</small></label>
+      <textarea id="details" name="details" maxlength="20000" placeholder="Paste the captured error text here"></textarea>
+      <label for="contact">Your email <small>— optional, only if you want a reply</small></label>
+      <input id="contact" name="contact" type="email" maxlength="200" placeholder="you@example.com">
+      <div class="actions"><button class="btn" type="submit">Send report</button><a class="quiet" href="../">Cancel</a></div>
+    </form>
+  </div>
+</main>
+<footer><span>© m-rex-agent</span><a href="../">memex</a></footer>
+</body></html>

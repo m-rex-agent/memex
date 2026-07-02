@@ -1,13 +1,26 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>memex</title><link rel="stylesheet" href="_style.css">
-</head><body><main>
-<div class="card">
-  <h1><span class="accent">memex</span> helm</h1>
-  <p class="sub">A local-first vault control plane. Your notes stay on your machine — no telemetry, no account, nothing tracked.</p>
-  <a class="btn" href="download/">Download</a>
-  <a class="quiet" href="report/">Report a problem</a>
-</div>
-<footer>© m-rex-agent</footer>
-</main></body></html>
+<title>memex — a local-first vault control plane</title>
+<meta name="description" content="memex keeps your notes on your machine. No telemetry, no account, nothing tracked.">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" fill="#3b82f6"/></svg>
+  <a class="brand" href="./"><span>memex</span> helm</a>
+</header>
+<main>
+  <div class="card">
+    <div class="kicker">local-first · loopback-only</div>
+    <h1>Your notes. Your machine.<br>A console to govern both.</h1>
+    <p class="lede">memex runs a vault server on <span class="mono">127.0.0.1</span> and gives you the helm — files, sync, agent policy, audit. No telemetry, no account, nothing tracked. Notes leave your device only through a cloud remote you set up yourself.</p>
+    <div class="term">$ memex-helm
+<span class="p">✓</span> server connected  <span class="a">transport=http</span>  host=127.0.0.1  <span class="a">policy=enforced</span></div>
+    <div class="actions">
+      <a class="btn" href="download/">Download</a>
+      <a class="quiet" href="report/">Report a problem</a>
+    </div>
+  </div>
+</main>
+<footer><span>© m-rex-agent</span><a href="report/">report</a><a href="download/">download</a></footer>
+</body></html>
