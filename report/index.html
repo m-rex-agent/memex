@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report a problem — memex</title><link rel="stylesheet" href="../_style.css">
+</head><body><main>
+<div class="card">
+  <h1>Report a <span class="accent">memex</span> problem</h1>
+  <p class="sub">Describe what happened. If the app showed error details ("Show details"), paste them — they make the difference.</p>
+  <form action="PASTE_APPS_SCRIPT_EXEC_URL" method="POST">
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <label for="what">What happened?</label>
+    <input id="what" name="what" required placeholder="e.g. The local server couldn't start after an update">
+    <label for="details">Error details (paste from “Show details”)</label>
+    <textarea id="details" name="details" placeholder="Paste the captured error text here"></textarea>
+    <label for="contact">Your email (optional — only if you want a reply)</label>
+    <input id="contact" name="contact" type="email" placeholder="you@example.com">
+    <div style="margin-top:18px"><button class="btn" type="submit">Send report</button></div>
+  </form>
+</div>
+<footer><a class="quiet" href="../">memex</a></footer>
+</main></body></html>
