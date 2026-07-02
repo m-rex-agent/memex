@@ -13,17 +13,57 @@
     <div class="kicker">problem report</div>
     <h1>Something broke. Tell us how.</h1>
     <p class="lede">Describe what happened. If the app showed error details ("Show details"), paste them below — they make the difference.</p>
-    <form action="https://script.google.com/macros/s/AKfycbyNa94d2YLzZghiIfJ8LkhtXWBf4WaX1fVcHbEEOk0iFVN-GbZC0hKZ2QjmGMU4pYfn/exec" method="POST">
+    <form id="rf" action="https://script.google.com/macros/s/AKfycbyNa94d2YLzZghiIfJ8LkhtXWBf4WaX1fVcHbEEOk0iFVN-GbZC0hKZ2QjmGMU4pYfn/exec" method="POST">
       <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label for="what">What happened?</label>
       <input id="what" name="what" required maxlength="2000" placeholder="e.g. The local server couldn't start after an update">
       <label for="details">Error details <small>— paste from “Show details”</small></label>
       <textarea id="details" name="details" maxlength="20000" placeholder="Paste the captured error text here"></textarea>
-      <label for="contact">Your email <small>— optional, only if you want a reply</small></label>
-      <input id="contact" name="contact" type="email" maxlength="200" placeholder="you@example.com">
-      <div class="actions"><button class="btn" type="submit">Send report</button><a class="quiet" href="../">Cancel</a></div>
+      <label for="shots">Screenshots <small>— optional, up to 2 images, 5 MB total</small></label>
+      <input id="shots" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
+      <p id="ferr" role="alert" style="display:none;margin-top:8px;font-size:13px;color:var(--deny)"></p>
+      <div class="actions"><button class="btn" id="send" type="submit">Send report</button><a class="quiet" href="../">Cancel</a></div>
     </form>
   </div>
 </main>
 <footer><span>© m-rex-agent</span><a href="../">memex</a></footer>
+<script>
+(() => {
+  const form = document.getElementById("rf");
+  const shots = document.getElementById("shots");
+  const err = document.getElementById("ferr");
+  const send = document.getElementById("send");
+  const MAX_FILES = 2, MAX_TOTAL = 5 * 1024 * 1024;
+  const OK_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+  function fail(msg) { err.textContent = msg; err.style.display = "block"; send.disabled = false; send.textContent = "Send report"; }
+  let encoding = false;
+  form.addEventListener("submit", (ev) => {
+    if (encoding) return;               // second pass: hidden fields ready → let it POST
+    const files = Array.from(shots.files || []);
+    if (files.length === 0) return;     // no attachments → plain submit
+    ev.preventDefault();
+    err.style.display = "none";
+    if (files.length > MAX_FILES) return fail("At most " + MAX_FILES + " images.");
+    if (files.some(f => !OK_TYPES.includes(f.type))) return fail("Images only (png, jpg, webp, gif).");
+    if (files.reduce((s, f) => s + f.size, 0) > MAX_TOTAL) return fail("Images exceed 5 MB total.");
+    send.disabled = true; send.textContent = "Encoding…";
+    Promise.all(files.map(f => new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res({ name: f.name, data: String(r.result).split(",", 2)[1] });
+      r.onerror = rej;
+      r.readAsDataURL(f);
+    }))).then(encoded => {
+      encoded.forEach((f, i) => {
+        for (const [k, v] of [["name", f.name], ["data", f.data]]) {
+          const h = document.createElement("input");
+          h.type = "hidden"; h.name = "att" + (i + 1) + "_" + k; h.value = v;
+          form.appendChild(h);
+        }
+      });
+      encoding = true;
+      form.submit();
+    }).catch(() => fail("Could not read an image — try a different file."));
+  });
+})();
+</script>
 </body></html>
