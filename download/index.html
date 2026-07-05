@@ -12,13 +12,64 @@
   <div class="card">
     <div class="kicker">macOS · Windows · Linux</div>
     <h1>Download memex</h1>
-    <p class="lede">Installers are published on the releases page. Reinstalling repairs a damaged install — your vault and settings are kept.</p>
-    <div class="status"><span class="dot faint"></span><span>The first public installers ship with the initial release. This page is live early so the app already points somewhere permanent.</span></div>
+    <p class="lede">Everything ships in one installer — the app, its local server, and its tools. No accounts, no other downloads. Reinstalling repairs a damaged install; your vault and settings are kept.</p>
+    <div class="status"><span class="dot allow"></span><span>Latest version: <span class="mono" id="ver">see the release notes</span></span></div>
+
+    <div class="dl" id="dl">
+      <div class="dl-row" data-os="macos">
+        <div class="dl-info">
+          <div class="dl-name">macOS <span class="dl-arch mono">Apple Silicon</span></div>
+          <details class="dl-help"><summary>First launch</summary>
+            The app is not yet signed with an Apple certificate, so macOS blocks a normal open once.
+            Right-click <span class="mono">memex_helm</span> in Applications → <b>Open</b> → <b>Open</b>. Only needed the first time.
+          </details>
+        </div>
+        <a class="btn" href="https://github.com/m-rex-agent/memex/releases/latest/download/memex-macos-arm64.dmg">Download .dmg</a>
+      </div>
+      <div class="dl-row" data-os="windows">
+        <div class="dl-info">
+          <div class="dl-name">Windows <span class="dl-arch mono">x64</span></div>
+          <details class="dl-help"><summary>First launch</summary>
+            The installer is not yet signed, so SmartScreen interrupts once.
+            Click <b>More info</b> → <b>Run anyway</b>. Only needed the first time.
+          </details>
+        </div>
+        <a class="btn" href="https://github.com/m-rex-agent/memex/releases/latest/download/memex-windows-x64-setup.exe">Download installer</a>
+      </div>
+      <div class="dl-row" data-os="linux">
+        <div class="dl-info">
+          <div class="dl-name">Linux <span class="dl-arch mono">x86_64 AppImage</span></div>
+          <details class="dl-help"><summary>First launch</summary>
+            Make it executable, then run it:
+            <span class="mono">chmod +x memex-linux-x86_64.AppImage && ./memex-linux-x86_64.AppImage</span>
+          </details>
+        </div>
+        <a class="btn" href="https://github.com/m-rex-agent/memex/releases/latest/download/memex-linux-x86_64.AppImage">Download AppImage</a>
+      </div>
+    </div>
+
     <div class="actions">
-      <a class="btn" href="https://github.com/m-rex-agent/memex/releases/latest">Latest release</a>
+      <a class="quiet" href="https://github.com/m-rex-agent/memex/releases/latest/download/SHA256SUMS.txt">Verify a download (SHA-256 checksums)</a>
+      <a class="quiet" href="https://github.com/m-rex-agent/memex/releases">All releases</a>
       <a class="quiet" href="../report/">Something broken? Report it</a>
     </div>
   </div>
 </main>
 <footer><span>© m-rex-agent</span><a href="../">memex</a></footer>
+<script>
+// Progressive enhancement only — every link above works without this.
+(function () {
+  var ua = navigator.userAgent;
+  var os = /Mac/.test(ua) ? "macos" : /Win/.test(ua) ? "windows" : /Linux|X11/.test(ua) ? "linux" : null;
+  if (os) {
+    var dl = document.getElementById("dl");
+    var mine = dl.querySelector('[data-os="' + os + '"]');
+    if (mine) { mine.classList.add("mine"); dl.prepend(mine); }
+  }
+  fetch("https://api.github.com/repos/m-rex-agent/memex/releases/latest")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.tag_name) document.getElementById("ver").textContent = j.tag_name; })
+    .catch(function () { /* version label keeps its static text */ });
+})();
+</script>
 </body></html>
