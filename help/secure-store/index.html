@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parola deposu / Secure store — memex</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+  .card h2 { font-size: 16px; font-weight: 600; margin-top: 26px; }
+  .card ul, .card ol { margin: 10px 0 0 20px; color: var(--muted); }
+  .card li + li { margin-top: 8px; }
+  .card code { font-family: "JetBrains Mono", monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+  .card pre.cmd { margin: 8px 0; padding: 8px 10px; border-radius: 6px; background: rgba(127,127,127,.12); overflow-x: auto; }
+  .card pre.cmd code { white-space: pre; overflow-wrap: normal; }
+  .langsw { display: none; margin: 0 0 14px; font-size: 13px; }
+  .js .langsw { display: block; }
+  .langsw button { background: none; border: 0; padding: 2px 4px; font: inherit; color: var(--muted); cursor: pointer; }
+  .langsw button[aria-pressed="true"] { color: var(--text); font-weight: 600; }
+  .langsw span { color: var(--faint); }
+  .langdiv + .langdiv { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--faint); }
+  .js .langdiv + .langdiv { margin-top: 0; padding-top: 0; border-top: 0; }
+  html[data-lang="tr"] .langdiv[lang="en"], html[data-lang="en"] .langdiv[lang="tr"] { display: none; }
+</style>
+<script>
+(function () {
+  var d = document.documentElement;
+  d.className += " js";
+  var l = /^tr\b/i.test(navigator.language || "") ? "tr" : "en";
+  d.setAttribute("data-lang", l); d.lang = l;
+})();
+</script>
+</head><body>
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" fill="#3b82f6"/></svg>
+  <a class="brand" href="../../"><span>memex</span> helm</a><span class="crumb">help</span>
+</header>
+<main>
+  <div class="card">
+    <div class="langsw" role="group" aria-label="Language / Dil"><button type="button" data-set="tr" aria-pressed="false">TR</button> <span aria-hidden="true">|</span> <button type="button" data-set="en" aria-pressed="false">EN</button></div>
+    <div class="langdiv" lang="tr">
+      <div class="kicker">Linux · bulut depoları</div>
+      <h1>Sisteminin parola deposunu aç</h1>
+      <p class="lede">memex’te “Bulut depoları bu sistemde kullanılamıyor” uyarısını görüyorsan sisteminde çalışan bir parola deposu yok. memex, bulut bağlantı bilgilerini bu depoda saklar; sen bir parola deposu başlatana kadar bulut depoları kullanılamaz. Bir dakikalık iş.</p>
+
+      <h2>GNOME, Ubuntu, Fedora Workstation</h2>
+      <ul><li>Parola deposu sistemle birlikte gelir. Kurulu ve çalışır durumda olduğundan emin ol: <code>sudo apt install gnome-keyring</code> (Fedora: <code>sudo dnf install gnome-keyring</code>). Sonra oturumu kapatıp yeniden aç.</li></ul>
+
+      <h2>KDE Plasma</h2>
+      <ul><li>Sistem Ayarları’nı aç, “KDE Wallet” (KDE Cüzdanı) bölümüne git ve “Enable the KDE wallet subsystem” (KDE cüzdan alt sistemini etkinleştir) seçeneğini işaretle; “Secret Service” seçeneği de görünüyorsa onu da aç. Bölüm yoksa önce <code>kwalletmanager</code> paketini kur (<code>sudo apt install kwalletmanager</code>). Sonra oturumu kapatıp yeniden aç.</li></ul>
+
+      <h2>i3</h2>
+      <ul><li><code>gnome-keyring</code> paketini kur, şu satırı <code>~/.config/i3/config</code> dosyasına ekle ve oturumu kapatıp yeniden aç (i3’ü yeniden başlatmak bu satırı çalıştırmaz):<pre class="cmd"><code>exec --no-startup-id gnome-keyring-daemon --start --components=secrets</code></pre></li></ul>
+
+      <h2>Sway</h2>
+      <ul><li><code>gnome-keyring</code> paketini kur, şu satırı <code>~/.config/sway/config</code> dosyasına ekle ve oturumu kapatıp yeniden aç (yapılandırmayı yenilemek bu satırı çalıştırmaz):<pre class="cmd"><code>exec gnome-keyring-daemon --start --components=secrets</code></pre>Bazı kurulumlar bu hizmeti zaten başlatır; seninki başlatıyorsa bu satıra gerek yok.</li></ul>
+
+      <h2>Hyprland</h2>
+      <ul><li><code>gnome-keyring</code> paketini kur, şu satırı <code>~/.config/hypr/hyprland.conf</code> dosyasına ekle ve oturumu kapatıp yeniden aç:<pre class="cmd"><code>exec-once = gnome-keyring-daemon --start --components=secrets</code></pre>Bazı kurulumlar bu hizmeti zaten başlatır; seninki başlatıyorsa bu satıra gerek yok.</li></ul>
+
+      <h2>KeePassXC</h2>
+      <ul><li>Çalışan başka bir parola deposu varsa önce onu kapat. Sonra Araçlar → Ayarlar → Gizli hizmet bütünleşmesi bölümünü aç ve “KeepassXC Freedesktop.org gizli hizmet bütünleşmesi kullanılsın” seçeneğini işaretle. Ardından veri tabanını aç, Veri tabanı → Veri tabanı ayarları → Gizli hizmet bütünleşmesi bölümüne git ve “Bu grubun altındaki kayıtları açığa çıkart” alanından bir grup seç.</li></ul>
+
+      <h2>Sonra</h2>
+      <ol>
+        <li>memex’e dön ve “Yeniden dene”ye tıkla.</li>
+        <li>Bulut depoları hâlâ kullanılamıyorsa <a href="../../report/">Sorun bildir</a> ve uygulamanın gösterdiği ayrıntıları ekle.</li>
+      </ol>
+      <div class="actions">
+        <a class="btn" href="../../report/">Sorun bildir</a>
+        <a class="quiet" href="../../">memex</a>
+      </div>
+    </div>
+    <div class="langdiv" lang="en">
+      <div class="kicker">Linux · cloud storage</div>
+      <h1>Turn on your system’s password store</h1>
+      <p class="lede">memex keeps your cloud connection details in your system’s password store. Your system has none running, so cloud storage is unavailable until you start one. It takes a minute.</p>
+
+      <h2>GNOME, Ubuntu, Fedora Workstation</h2>
+      <ul><li>The password store is built in. Make sure it is installed and running: <code>sudo apt install gnome-keyring</code> (Fedora: <code>sudo dnf install gnome-keyring</code>), then log out and back in.</li></ul>
+
+      <h2>KDE Plasma</h2>
+      <ul><li>Open System Settings, go to KDE Wallet, and turn on “Enable the KDE wallet subsystem” (and the Secret Service option if it is shown). If the section is missing, install <code>kwalletmanager</code> first (<code>sudo apt install kwalletmanager</code>). Log out and back in.</li></ul>
+
+      <h2>i3</h2>
+      <ul><li>Install <code>gnome-keyring</code>, then add this line to <code>~/.config/i3/config</code> and log out and back in (restarting i3 does not run it):<pre class="cmd"><code>exec --no-startup-id gnome-keyring-daemon --start --components=secrets</code></pre></li></ul>
+
+      <h2>Sway</h2>
+      <ul><li>Install <code>gnome-keyring</code>, then add this line to <code>~/.config/sway/config</code> and log out and back in (reloading the config does not run it):<pre class="cmd"><code>exec gnome-keyring-daemon --start --components=secrets</code></pre>Some setups already start this service; if yours does, the line is not needed.</li></ul>
+
+      <h2>Hyprland</h2>
+      <ul><li>Install <code>gnome-keyring</code>, then add this line to <code>~/.config/hypr/hyprland.conf</code> and log out and back in:<pre class="cmd"><code>exec-once = gnome-keyring-daemon --start --components=secrets</code></pre>Some setups already start this service; if yours does, the line is not needed.</li></ul>
+
+      <h2>KeePassXC</h2>
+      <ul><li>Open Tools → Settings → Secret Service Integration and turn on “Enable KeePassXC Freedesktop.org Secret Service integration”. Then open your database, go to Database → Database Settings → Secret Service Integration, and expose a group. Stop any other password store first.</li></ul>
+
+      <h2>Then</h2>
+      <ol>
+        <li>Go back to memex and click “Yeniden dene” (Try again) after doing the steps.</li>
+        <li>Still unavailable? <a href="../../report/">Report it</a> and include the details the app shows.</li>
+      </ol>
+      <div class="actions">
+        <a class="btn" href="../../report/">Report a problem</a>
+        <a class="quiet" href="../../">memex</a>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><span>© m-rex-agent</span><a href="../../">memex</a></footer>
+<script>
+(function () {
+  var d = document.documentElement;
+  var titles = { tr: "Parola deposu — memex", en: "Secure store — memex" };
+  function apply(l) {
+    d.setAttribute("data-lang", l); d.lang = l; document.title = titles[l];
+    document.querySelectorAll(".langsw button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.set === l)); });
+  }
+  document.querySelectorAll(".langsw button").forEach(function (b) { b.addEventListener("click", function () { apply(b.dataset.set); }); });
+  apply(d.getAttribute("data-lang") || "en");
+})();
+</script>
+</body></html>
