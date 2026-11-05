@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erişim anahtarlarını koru / Protect your access keys — memex</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+  .card h2 { font-size: 16px; font-weight: 600; margin-top: 26px; }
+  .card h3 { font-size: 14px; font-weight: 600; margin-top: 18px; }
+  .card ul, .card ol { margin: 10px 0 0 20px; color: var(--muted); }
+  .card li + li { margin-top: 8px; }
+  .card code { font-family: "JetBrains Mono", monospace; font-size: 12.5px; overflow-wrap: anywhere; }
+  .card pre.cmd { margin: 8px 0; padding: 8px 10px; border-radius: 6px; background: rgba(127,127,127,.12); overflow-x: auto; }
+  .card pre.cmd code { white-space: pre; overflow-wrap: normal; }
+  .langsw { display: none; margin: 0 0 14px; font-size: 13px; }
+  .js .langsw { display: block; }
+  .langsw button { background: none; border: 0; padding: 2px 4px; font: inherit; color: var(--muted); cursor: pointer; }
+  .langsw button[aria-pressed="true"] { color: var(--text); font-weight: 600; }
+  .langsw span { color: var(--faint); }
+  .langdiv + .langdiv { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--faint); }
+  .js .langdiv + .langdiv { margin-top: 0; padding-top: 0; border-top: 0; }
+  html[data-lang="tr"] .langdiv[lang="en"], html[data-lang="en"] .langdiv[lang="tr"] { display: none; }
+</style>
+<script>
+(function () {
+  var d = document.documentElement;
+  d.className += " js";
+  var l = /^tr\b/i.test(navigator.language || "") ? "tr" : "en";
+  d.setAttribute("data-lang", l); d.lang = l;
+})();
+</script>
+</head><body>
+<header>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7L12 2.5Z" stroke="#3b82f6" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.4" fill="#3b82f6"/></svg>
+  <a class="brand" href="../../"><span>memex</span> helm</a><span class="crumb">help</span>
+</header>
+<main>
+  <div class="card">
+    <div class="langsw" role="group" aria-label="Language / Dil"><button type="button" data-set="tr" aria-pressed="false">TR</button> <span aria-hidden="true">|</span> <button type="button" data-set="en" aria-pressed="false">EN</button></div>
+
+    <div class="langdiv" lang="tr">
+      <div class="kicker">Sunucu · arayüzsüz kurulum</div>
+      <h1>Erişim anahtarlarını koru</h1>
+      <p class="lede">memex-mcp'yi memex uygulaması olmadan, kendi başına çalıştırıyorsan erişim anahtarların varsayılan olarak korunmaz. Bu sayfa anahtarları nasıl koruyacağını ve her koruma düzeyinin neyi durdurup neyi durdurmadığını anlatır.</p>
+
+      <h2>“Erişim anahtarları korunmuyor” ne demek?</h2>
+      <p>Sunucu açılırken şu üç satırı yazıyorsa anahtarların korumasızdır:</p>
+      <pre class="cmd"><code>memex-mcp: access keys are NOT protected — any program running as this user could add an admin key.
+Protect them:  memex-mcp trust init
+Guide:         https://m-rex-agent.github.io/memex/help/headless-security/</code></pre>
+      <p>Kimin ne yapabileceğini üç dosya belirler: <code>tokens.json</code> (anahtarlar), <code>remotes.json</code> (bulutlar) ve <code>policy.yaml</code> (kurallar). Hepsi yapılandırma klasöründedir. Koruma yokken bu kullanıcı olarak çalışan herhangi bir program bu dosyalara yazıp kendine yönetici anahtarı ekleyebilir. Koruma açıkken sunucu her dosyadaki imzayı doğrular; imzası eksik ya da yanlış olan dosyaya güvenmez. Güvenilmeyen <code>tokens.json</code> hiçbir anahtarı tanımaz, güvenilmeyen <code>remotes.json</code> hiçbir bulut yüklemez, güvenilmeyen <code>policy.yaml</code> her şeyi reddeder.</p>
+      <p>İmzayı üreten gizli anahtar yapılandırma klasöründe tutulmaz, ayrı bir dosyada durur. Korumanın gücü bu dosyayı kimin okuyabildiğine bağlıdır.</p>
+
+      <h2>Üç koruma düzeyi</h2>
+      <ol>
+        <li><strong>Hiçbir şey.</strong> Sunucu uyarıyı yazar ve çalışır. Bu kullanıcı olarak çalışan her program yönetici anahtarı ekleyebilir.</li>
+        <li><strong><code>trust init</code>.</strong> Gizli anahtar dosyasını oluşturur ve üç dosyayı imzalar. Dosyalara gizli anahtarı bilmeden yazan bir program artık işe yaramaz: sunucu yazılanı reddeder. Gizli anahtar dosyasını diğer kullanıcılar okuyamaz. <strong>Durdurmadığı şey:</strong> sunucuyla aynı kullanıcı olarak çalışan bir program gizli anahtar dosyasını da okuyabilir ve geçerli imza üretebilir.</li>
+        <li><strong>Ayrı hizmet kullanıcısı.</strong> Sunucuyu yalnızca bu iş için açılmış bir hesapla çalıştırırsın ve gizli anahtar dosyası o hesaba (ya da root'a) ait olur. Senin kullanıcın olarak çalışan programlar gizli anahtarı okuyamaz, yapılandırma klasörüne yazamaz. <strong>Durdurmadığı şey:</strong> hizmet kullanıcısı olarak ya da root olarak çalışan bir program korumayı aşar. Bu düzey, bilgisayarındaki diğer programlarla sunucu arasına sınır koyar; sunucu hesabının kendisini ele geçirene karşı koruma sağlamaz.</li>
+      </ol>
+
+      <h2>1. adım: <code>trust init</code></h2>
+      <pre class="cmd"><code>memex-mcp trust init</code></pre>
+      <p>Komut sırasıyla şunları yapar:</p>
+      <ul>
+        <li>Gizli anahtarı yapılandırma klasörünün içindeki <code>trust.secret</code> dosyasına yazar (yalnızca sahibi okuyabilir). Anahtarı ekrana yazmaz. Başka bir yer istersen <code>--secret-file &lt;yol&gt;</code> ekle.</li>
+        <li><code>tokens.json</code>, <code>remotes.json</code> ve <code>policy.yaml</code> dosyalarını imzalar. Henüz var olmayan dosyayı sunucu kendisi oluştururken imzalar.</li>
+        <li>Sunucuyu nasıl başlatacağını yazar.</li>
+      </ul>
+      <p>Dosyalardan biri zaten imzalıysa komut hiçbir şeyi değiştirmeden durur ve <code>trust rotate</code> komutunu önerir. Yarıda kalmış bir <code>trust init</code>'i aynı komutla yeniden çalıştırabilirsin: daha önce yazdığı gizli anahtarı kullanır ve kaldığı yerden devam eder.</p>
+      <p>Sunucuyu gizli anahtarla başlat:</p>
+      <pre class="cmd"><code>memex-mcp --trust-secret-file /yol/trust.secret</code></pre>
+      <p>ya da yolu bir ortam değişkeniyle ver (değişken yalnızca yolu taşır, anahtarı değil):</p>
+      <pre class="cmd"><code>MEMEX_MCP_TRUST_SECRET_FILE=/yol/trust.secret memex-mcp</code></pre>
+      <p>Gizli anahtar dosyası 64 küçük harfli onaltılık karakter içermeli; POSIX'te kipi <code>0600</code> olmalı ve sunucuyu çalıştıran kullanıcıya ait olmalıdır (Windows'ta yalnızca sahibi, SYSTEM ve Administrators erişebilir). Sunucunun kullanamadığı bir dosya verirsen sunucu açılmaz (çıkış kodu 2); böylece bir yazım hatası korumayı hiçbir zaman sessizce kapatmaz. Gizli anahtar hiç verilmezse sunucu korumasız çalışır.</p>
+      <p>Yapay zekâ araçlarının başlattığı sunucular (stdio) gizli anahtar istemez; bulut işlemlerini anahtarları tutan sunucuya iletir ve kararı o sunucu verir.</p>
+      <p>İmzalı bir kurulumda <code>memex-mcp token list</code>, <code>token mint</code> ve <code>token revoke</code> komutlarına da gizli anahtarı ver (<code>--trust-secret-file &lt;yol&gt;</code> ya da aynı ortam değişkeni). Vermezsen komut dosyaya dokunmadan durur.</p>
+
+      <h3>Kararını bekleyen bulutlar</h3>
+      <p><code>trust init</code>, <code>remotes.json</code> içindeki her bulutu kontrol eder. Kendi bölümü olmayan, kısıtsız bir sarmalayıcı olan ya da izin verilmeyen seçenek taşıyan bulut imzalanmaz; silinmez ve yüklenmez, sebebiyle birlikte <code>remotes.held.json</code> dosyasına kenara ayrılır. Baştan bildiğin bir bulutu imzalamak için <code>--keep</code> ekle (birden çok kez kullanılabilir):</p>
+      <pre class="cmd"><code>memex-mcp trust init --keep drive --keep arsiv</code></pre>
+      <p>Sonradan karar vermek için:</p>
+      <pre class="cmd"><code>memex-mcp trust held list
+memex-mcp trust held keep &lt;bulut-kimliği&gt;
+memex-mcp trust held keep &lt;bulut-kimliği&gt; --acknowledge-risk
+memex-mcp trust held remove &lt;bulut-kimliği&gt;
+memex-mcp trust held keep-policy
+memex-mcp trust held remove-policy</code></pre>
+      <p><code>keep</code>, bulut kontrolden geçerse onu imzalar ve devreye alır. Kontrolden geçmeyen bir bulutu yine de kullanmak için <code>--acknowledge-risk</code> ekle; böylece o bulutun kısıtsız erişimini bilerek kabul edersin. <code>remove</code> kenara ayrılan kaydı siler. <code>keep-policy</code> ve <code>remove-policy</code> kenara ayrılan kural dosyası için aynı kararı verir. Bu komutlar gizli anahtarı ister (<code>--secret-file</code> ile ya da varsayılan konumdan); ardından çalışan sunucuyu yeniden başlat.</p>
+
+      <h2>2. adım: ayrı hizmet kullanıcısı</h2>
+      <p>Aşağıdaki kurulumların hepsi için önce <code>trust init</code> çalıştır, sonra dosyaları üret:</p>
+      <pre class="cmd"><code>memex-mcp trust service-files ./hizmet</code></pre>
+      <p>Komut bulunduğun işletim sistemi için dosyaları gerçek yollarınla doldurur ve kurulum ile kaldırma satırlarını ekrana yazar. Hiçbir şey kurmaz, sistemde hiçbir şeyi değiştirmez. Başka bir sistem için dosya üretmek istersen <code>--os linux|darwin|win32</code> ekle. Komut, sunucunun kullanacağı kasayı bulamazsa durur: <code>MEMEX_VAULT_PATH</code> ayarla ya da <code>--vault &lt;yol&gt;</code> ver. İlk çalıştırmada ikisini tek komutla yapabilirsin: <code>memex-mcp trust init --service-files ./hizmet</code>. Her kurulum satırının yanında onu birebir geri alan bir kaldırma satırı yazılır; kurulumu geri almak için bu satırları ters sırayla çalıştır.</p>
+
+      <h3>Linux (systemd)</h3>
+      <p>Üretilen <code>memex-mcp.service</code> birimi hizmeti <code>memex</code> adlı kullanıcı olarak çalıştırır, gizli anahtarı systemd'ye yalnızca bu hizmete özel bir bellek alanına kopyalatır (<code>LoadCredential=</code>) ve sunucuyu <code>--trust-secret-file ${CREDENTIALS_DIRECTORY}/memex-trust</code> ile başlatır. Kurulum satırları şunları yapar:</p>
+      <ul>
+        <li><code>memex</code> kullanıcısını oluşturur (bu kullanıcı oturum açamaz).</li>
+        <li>Yapılandırma klasörünü <code>/var/lib/memex-mcp</code> altına taşır (hizmet kullanıcısı senin <code>/home</code> altındaki ana klasörüne giremez). Gizli anahtar dosyası root'a ait kalır. Hizmet ortamında <code>MEMEX_MCP_CONFIG_DIR=/var/lib/memex-mcp</code> ayarlıdır.</li>
+        <li><code>memex</code> kullanıcısına kasada ve kasaya giden yoldaki klasörlerde gereken erişimi verir.</li>
+        <li>Birimi <code>/etc/systemd/system</code> altına kopyalar ve <code>systemctl enable --now memex-mcp</code> ile başlatır.</li>
+      </ul>
+      <p>Hizmetin yapılandırması üzerinde bir komut çalıştırmak için (örneğin durum kontrolü) klasörü ve gizli anahtarı ver; <code>trust service-files</code> bu satırın aynısını kurulum satırlarından sonra da yazar:</p>
+      <pre class="cmd"><code>sudo env MEMEX_MCP_CONFIG_DIR=/var/lib/memex-mcp memex-mcp trust status --secret-file /var/lib/memex-mcp/trust.secret</code></pre>
+
+      <h3>macOS (launchd)</h3>
+      <p>Üretilen <code>dev.memex.mcp.plist</code> dosyası sunucuyu <code>_memex</code> adlı gizli bir hizmet hesabı olarak çalıştırır. Hesap giriş ekranında görünmez ve oturum açamaz; kimliği 450–499 aralığındaki ilk boş değerdir (macOS 27'de zorunlu aralık budur, eski sürümlerde 200–400 kullanılırdı; gerekirse ilk kurulum satırındaki aralığı düzenle). Kurulum satırları hesabı <code>sysadminctl</code> ile oluşturur (yönetici parolası sorabilir), yapılandırma klasörünü ve gizli anahtar dosyasını bu hesaba verir, kasaya bu hesap için bir erişim kuralı ekler, plist'i <code>/Library/LaunchDaemons</code> altına koyar ve <code>launchctl bootstrap system</code> ile başlatır.</p>
+      <ul>
+        <li>Kasayı Masaüstü, Belgeler ve İndirilenler dışında tut: macOS arka plan hizmetlerinin bu klasörlere girmesini engeller.</li>
+        <li>Gizli anahtar dosyası artık <code>_memex</code> hesabına aittir (kip <code>0600</code>). Hizmetin yapılandırması üzerinde bir komut çalıştırmak için: <code>sudo -u _memex env MEMEX_MCP_CONFIG_DIR=&lt;yapılandırma klasörü&gt; memex-mcp trust status --secret-file &lt;gizli anahtar yolu&gt;</code></li>
+      </ul>
+
+      <h3>Windows (hizmet)</h3>
+      <p><code>trust service-files</code> bir <code>memex-mcp-windows-service.txt</code> dosyası yazar: hizmetin ortam değişkenleri, komut satırı, kurulum ve kaldırma adımları. Adımlar <code>memex</code> adlı bir kullanıcı oluşturur, gizli anahtar dosyasının sahibini ve izinlerini yalnızca bu kullanıcı erişecek şekilde ayarlar (SYSTEM ve Administrators dışında başka hesap erişemez), yapılandırma klasörüne ve kasaya yazma izni verir, sonra hizmeti <code>sc.exe</code> ile oluşturur. Bilmen gereken üç şey:</p>
+      <ul>
+        <li><strong>Node bir hizmet sarmalayıcısı olmadan Windows hizmeti olarak çalışmaz.</strong> <code>sc.exe start</code> hata 1053 verir. memex-mcp ile birlikte sarmalayıcı gelmez; WinSW ya da NSSM gibi seçtiğin bir sarmalayıcıyı dosyadaki komut satırı ve ortam değişkenleriyle kur. <code>sc.exe</code> satırları hesabı, dosya izinlerini ve bağımsız değişkenleri gösterir.</li>
+        <li>İlk başlatmadan önce <code>memex</code> kullanıcısına “Hizmet olarak oturum açma” (Log on as a service) hakkını ver: <code>secpol.msc</code> → Yerel İlkeler → Kullanıcı Hakları Ataması. <code>sc.exe create</code> bunu vermez.</li>
+        <li>Adımları yükseltilmiş (yönetici) bir komut isteminde çalıştır.</li>
+      </ul>
+
+      <h3>Docker</h3>
+      <p>Gizli anahtar dosyasının sunucuyu çalıştıran kullanıcıya ait olması ve yalnızca ona açık olması gerekir. Docker'ın varsayılan gizli dosyaları (<code>/run/secrets/…</code>) root'a aittir ve herkes tarafından okunabilir; sunucu böyle bir dosyayı <strong>reddeder</strong> ve açılmaz. Bunun yerine sahibi kapsayıcıdaki kullanıcı olan, kipi <code>0600</code> olan bir dosyayı bağla.</p>
+      <ol>
+        <li>Ana makinede, kapsayıcıya bağlayacağın yapılandırma klasörüyle <code>trust init</code> çalıştır:
+          <pre class="cmd"><code>MEMEX_MCP_CONFIG_DIR=$PWD/config memex-mcp trust init --secret-file $PWD/trust.secret</code></pre></li>
+        <li>Dosyaları kapsayıcının kullanıcısına ver (aşağıdaki örnekte 1000):
+          <pre class="cmd"><code>sudo chown 1000:1000 $PWD/trust.secret $PWD/config
+sudo chmod 600 $PWD/trust.secret</code></pre></li>
+        <li>Kapsayıcıyı aynı kullanıcıyla çalıştır, dosyayı salt okunur bağla ve yolunu ortam değişkeniyle ver:
+          <pre class="cmd"><code>docker run --user 1000:1000 \
+  -v $PWD/config:/config -v $PWD/trust.secret:/run/memex/trust.secret:ro \
+  -e MEMEX_MCP_CONFIG_DIR=/config \
+  -e MEMEX_MCP_TRUST_SECRET_FILE=/run/memex/trust.secret \
+  &lt;memex-mcp-imajın&gt;</code></pre></li>
+      </ol>
+      <p>Docker Compose'un <code>secrets:</code> bölümü Swarm dışında dosyanın sahibini ve kipini değiştirmez; bu yüzden dosyayı yukarıdaki gibi bağla.</p>
+
+      <h2>Gizli anahtarı değiştir: <code>trust rotate</code></h2>
+      <pre class="cmd"><code>memex-mcp trust rotate</code></pre>
+      <p>Komut yeni bir gizli anahtar üretir, eski anahtarla doğrulanan her dosyayı yeni anahtarla yeniden imzalar ve gizli anahtar dosyasını tek adımda değiştirir. Bittikten sonra sunucuyu yeniden başlat; çalışan sunucu yeni anahtarı kendiliğinden okumaz.</p>
+      <ul>
+        <li><strong>Yarıda kalırsa:</strong> yeni anahtar <code>trust.secret.next</code> dosyasında bekler ve <code>trust status</code> ve sunucu açılırken “rotation incomplete — run <code>memex-mcp trust rotate</code>” yazar. Komutu yeniden çalıştırman yeter: kaldığı yerden devam eder.</li>
+        <li><strong>Hiçbir dosya doğrulanmıyorsa</strong> (örneğin anahtar dosyası başka bir kurulumdan geldiyse) komut hiçbir şeyi değiştirmeden durur. Anahtarı yine de değiştirmek istersen <code>--force</code> ekle. Doğrulanmayan dosyalar olduğu gibi kalır ve sunucu onları reddetmeyi sürdürür.</li>
+        <li>Gizli anahtarı kaybettiysen <code>rotate</code> işe yaramaz (eskisini okuması gerekir); <code>trust reset</code> kullan. Komut yalnızca gizli anahtar dosyası yoksa ya da hiçbir dosyayı doğrulamıyorsa çalışır. Önce <code>memex-mcp trust reset</code> çalıştır: hiçbir şeyi değiştirmeden ne olacağını gösterir. Onaylıyorsan <code>memex-mcp trust reset --yes</code> çalıştır (başka bir gizli anahtar yolu için <code>--secret-file &lt;yol&gt;</code>). Komut şunları yapar:
+          <ul>
+            <li>Tüm erişim anahtarları iptal edilir; <code>tokens.json</code>'un yedeği saklanır. Yeni bir yönetici anahtarı üret ve yapay zekâ araçlarını yeniden bağla: <code>memex-mcp token mint --kind admin --trust-secret-file &lt;yol&gt;</code></li>
+            <li>Bulutlar ve kurallar silinmez, kenara ayrılır. Her birine <code>memex-mcp trust held list</code>, <code>keep</code> ve <code>remove</code> ile karar ver.</li>
+            <li>Yeni bir gizli anahtar oluşturulur ve her şey onunla imzalanır. Eski gizli anahtar dosyası <code>&lt;gizli anahtar&gt;.lost-&lt;sayı&gt;</code> adıyla saklanır; kaybolduğundan emin olunca sil.</li>
+            <li>Sunucuyu yeni gizli anahtarla yeniden başlat.</li>
+          </ul></li>
+      </ul>
+
+      <h2>Durumu gör: <code>trust status</code></h2>
+      <pre class="cmd"><code>memex-mcp trust status</code></pre>
+      <pre class="cmd"><code>Trust secret file: /var/lib/memex-mcp/trust.secret
+  present, permissions ok
+Trust files:
+  tokens.json        signed (verified)  mode 0600
+  remotes.json       signed (verified)  mode 0600
+  policy.yaml        signed (verified)  mode 0600</code></pre>
+      <p>Komut her dosyanın imzasının doğrulanıp doğrulanmadığını, dosya kiplerini ve gizli anahtar dosyasının izinlerini gösterir; gizli anahtarı yazmaz. Her şey doğruysa çıkış kodu 0, aksi hâlde 1'dir. Çalışan bir sunucunun korunup korunmadığını <code>GET /health</code> yanıtındaki <code>"trust"</code> alanından da görebilirsin: <code>signed</code> korumalı, <code>unsigned</code> korumasızdır.</p>
+
+      <div class="actions">
+        <a class="btn" href="../../report/">Sorun bildir</a>
+        <a class="quiet" href="../../">memex</a>
+      </div>
+    </div>
+
+    <div class="langdiv" lang="en">
+      <div class="kicker">Server · headless setup</div>
+      <h1>Protect your access keys</h1>
+      <p class="lede">If you run memex-mcp on its own, without the memex app, your access keys are not protected by default. This page shows how to protect them and what each level of protection does and does not stop.</p>
+
+      <h2>What “access keys are NOT protected” means</h2>
+      <p>If the server prints these three lines when it starts, your keys are unprotected:</p>
+      <pre class="cmd"><code>memex-mcp: access keys are NOT protected — any program running as this user could add an admin key.
+Protect them:  memex-mcp trust init
+Guide:         https://m-rex-agent.github.io/memex/help/headless-security/</code></pre>
+      <p>Three files decide who can do what: <code>tokens.json</code> (keys), <code>remotes.json</code> (clouds) and <code>policy.yaml</code> (rules). All three live in the config folder. With no protection, any program running as this user can write to them and give itself an admin key. With protection on, the server checks a signature on each file and does not trust a file whose signature is missing or wrong. An untrusted <code>tokens.json</code> recognizes no key, an untrusted <code>remotes.json</code> loads no cloud, and an untrusted <code>policy.yaml</code> denies everything.</p>
+      <p>The secret that makes the signature is not kept in the config folder. It sits in a separate file, so the protection is only as strong as the list of who can read that file.</p>
+
+      <h2>The three levels</h2>
+      <ol>
+        <li><strong>Nothing.</strong> The server prints the warning and runs. Any program running as this user can add an admin key.</li>
+        <li><strong><code>trust init</code>.</strong> Creates the secret file and signs the three files. A program that writes to the files without knowing the secret no longer works: the server rejects what it wrote. Other users cannot read the secret file. <strong>What it does not stop:</strong> a program running as the same user as the server can read the secret file too, and can produce a valid signature.</li>
+        <li><strong>A dedicated service user.</strong> You run the server as an account made only for it, and the secret file belongs to that account (or to root). Programs running as your own user cannot read the secret or write to the config folder. <strong>What it does not stop:</strong> a program running as the service user, or as root, gets around it. This level puts a boundary between the server and the other programs on the machine; it does not protect against someone who takes over the server account itself.</li>
+      </ol>
+
+      <h2>Step 1: <code>trust init</code></h2>
+      <pre class="cmd"><code>memex-mcp trust init</code></pre>
+      <p>The command, in order:</p>
+      <ul>
+        <li>Writes the secret to <code>trust.secret</code> inside the config folder (readable by its owner only). It never prints the secret. To put it elsewhere, add <code>--secret-file &lt;path&gt;</code>.</li>
+        <li>Signs <code>tokens.json</code>, <code>remotes.json</code> and <code>policy.yaml</code>. A file that does not exist yet is signed by the server when it creates it.</li>
+        <li>Prints how to start the server.</li>
+      </ul>
+      <p>If any of the files is already signed, the command stops without changing anything and points you to <code>trust rotate</code>. You can run an interrupted <code>trust init</code> again: it uses the secret it already wrote and carries on.</p>
+      <p>Start the server with the secret:</p>
+      <pre class="cmd"><code>memex-mcp --trust-secret-file /path/to/trust.secret</code></pre>
+      <p>or give the path in an environment variable (the variable holds the path only, never the secret):</p>
+      <pre class="cmd"><code>MEMEX_MCP_TRUST_SECRET_FILE=/path/to/trust.secret memex-mcp</code></pre>
+      <p>The secret file must hold 64 lowercase hex characters. On POSIX its mode must be <code>0600</code> and it must belong to the user running the server (on Windows only its owner, SYSTEM and Administrators may have access). If you give a file the server cannot use, the server does not start (exit code 2), so a typo never switches protection off quietly. If you give no secret at all, the server runs unprotected.</p>
+      <p>Servers that an AI tool starts (stdio) need no secret. They pass cloud operations to the server that holds the keys, and that server makes the decision.</p>
+      <p>On a signed install, give the secret to <code>memex-mcp token list</code>, <code>token mint</code> and <code>token revoke</code> too (<code>--trust-secret-file &lt;path&gt;</code> or the same variable). Without it the command stops and leaves the file alone.</p>
+
+      <h3>Held clouds</h3>
+      <p><code>trust init</code> checks every cloud in <code>remotes.json</code>. A cloud that has no section of its own, is an unconfined wrapper, or carries an option that is not allowed is not signed. It is set aside in <code>remotes.held.json</code> with its reason: not deleted, not loaded. To sign in a cloud you know up front, add <code>--keep</code> (repeatable):</p>
+      <pre class="cmd"><code>memex-mcp trust init --keep drive --keep archive</code></pre>
+      <p>To decide later:</p>
+      <pre class="cmd"><code>memex-mcp trust held list
+memex-mcp trust held keep &lt;cloud-id&gt;
+memex-mcp trust held keep &lt;cloud-id&gt; --acknowledge-risk
+memex-mcp trust held remove &lt;cloud-id&gt;
+memex-mcp trust held keep-policy
+memex-mcp trust held remove-policy</code></pre>
+      <p><code>keep</code> signs the cloud in and puts it to use if it passes the check. To use a cloud that fails the check anyway, add <code>--acknowledge-risk</code>; that means accepting its unconfined reach on purpose. <code>remove</code> deletes the held record. <code>keep-policy</code> and <code>remove-policy</code> make the same decision for a held rules file. These commands need the secret (<code>--secret-file</code>, or the default location) and a restart of the running server.</p>
+
+      <h2>Step 2: a dedicated service user</h2>
+      <p>For every setup below, run <code>trust init</code> first, then generate the files:</p>
+      <pre class="cmd"><code>memex-mcp trust service-files ./service</code></pre>
+      <p>The command fills the files in with your real paths for the system you are on and prints the install and removal lines. It installs nothing and changes nothing on the system. To generate files for another system, add <code>--os linux|darwin|win32</code>. If it cannot find the vault the server will use, it stops: set <code>MEMEX_VAULT_PATH</code> or pass <code>--vault &lt;path&gt;</code>. On a first run you can do both at once: <code>memex-mcp trust init --service-files ./service</code>. Every install line comes with an exact undo line; run them in reverse order to take the setup back.</p>
+
+      <h3>Linux (systemd)</h3>
+      <p>The generated <code>memex-mcp.service</code> runs as a user named <code>memex</code>, has systemd copy the secret into a private memory area for this service only (<code>LoadCredential=</code>), and starts the server with <code>--trust-secret-file ${CREDENTIALS_DIRECTORY}/memex-trust</code>. The install lines:</p>
+      <ul>
+        <li>Create the <code>memex</code> user (it cannot log in).</li>
+        <li>Move the config folder to <code>/var/lib/memex-mcp</code> (the service user cannot enter your home folder under <code>/home</code>). The secret file stays owned by root. The service environment sets <code>MEMEX_MCP_CONFIG_DIR=/var/lib/memex-mcp</code>.</li>
+        <li>Give <code>memex</code> the access it needs to the vault and the folders on the way to it.</li>
+        <li>Copy the unit into <code>/etc/systemd/system</code> and start it with <code>systemctl enable --now memex-mcp</code>.</li>
+      </ul>
+      <p>To run a command against the service’s config (a status check, for example), give the folder and the secret. <code>trust service-files</code> prints this exact line after the install lines too:</p>
+      <pre class="cmd"><code>sudo env MEMEX_MCP_CONFIG_DIR=/var/lib/memex-mcp memex-mcp trust status --secret-file /var/lib/memex-mcp/trust.secret</code></pre>
+
+      <h3>macOS (launchd)</h3>
+      <p>The generated <code>dev.memex.mcp.plist</code> runs the server as a hidden service account named <code>_memex</code>. The account does not appear on the login window and cannot log in; its ID is the first free one between 450 and 499 (macOS 27 requires that range; older releases used 200–400, so edit the range in the first install line if you need to). The install lines create the account with <code>sysadminctl</code> (it may ask for an administrator password), give it the config folder and the secret file, add an access rule for it on the vault, put the plist in <code>/Library/LaunchDaemons</code> and start it with <code>launchctl bootstrap system</code>.</p>
+      <ul>
+        <li>Keep the vault outside Desktop, Documents and Downloads: macOS stops background services from entering those folders.</li>
+        <li>The secret file now belongs to <code>_memex</code> (mode <code>0600</code>). To run a command against the service’s config: <code>sudo -u _memex env MEMEX_MCP_CONFIG_DIR=&lt;config folder&gt; memex-mcp trust status --secret-file &lt;secret path&gt;</code></li>
+      </ul>
+
+      <h3>Windows (service)</h3>
+      <p><code>trust service-files</code> writes a <code>memex-mcp-windows-service.txt</code> file with the service’s environment variables, its command line, and the install and removal steps. The steps create a user named <code>memex</code>, set the secret file’s owner and permissions so only that user has access (apart from SYSTEM and Administrators), grant write access to the config folder and the vault, and create the service with <code>sc.exe</code>. Three things to know:</p>
+      <ul>
+        <li><strong>Node cannot run as a Windows service without a service wrapper.</strong> <code>sc.exe start</code> fails with error 1053. memex-mcp ships no wrapper; set up one you choose, such as WinSW or NSSM, with the command line and environment variables from the file. The <code>sc.exe</code> lines show the account, the file permissions and the arguments.</li>
+        <li>Before the first start, give <code>memex</code> the “Log on as a service” right: <code>secpol.msc</code> → Local Policies → User Rights Assignment. <code>sc.exe create</code> does not grant it.</li>
+        <li>Run the steps in an elevated (administrator) prompt.</li>
+      </ul>
+
+      <h3>Docker</h3>
+      <p>The secret file must belong to the user running the server and be open to that user only. Docker’s default secret files (<code>/run/secrets/…</code>) belong to root and are readable by everyone; the server <strong>refuses</strong> such a file and does not start. Mount a file owned by the container’s user with mode <code>0600</code> instead.</p>
+      <ol>
+        <li>On the host, run <code>trust init</code> with the config folder you will mount into the container:
+          <pre class="cmd"><code>MEMEX_MCP_CONFIG_DIR=$PWD/config memex-mcp trust init --secret-file $PWD/trust.secret</code></pre></li>
+        <li>Give the files to the container’s user (1000 in the example below):
+          <pre class="cmd"><code>sudo chown 1000:1000 $PWD/trust.secret $PWD/config
+sudo chmod 600 $PWD/trust.secret</code></pre></li>
+        <li>Run the container as that user, mount the file read-only and give its path in the environment variable:
+          <pre class="cmd"><code>docker run --user 1000:1000 \
+  -v $PWD/config:/config -v $PWD/trust.secret:/run/memex/trust.secret:ro \
+  -e MEMEX_MCP_CONFIG_DIR=/config \
+  -e MEMEX_MCP_TRUST_SECRET_FILE=/run/memex/trust.secret \
+  &lt;your-memex-mcp-image&gt;</code></pre></li>
+      </ol>
+      <p>Outside Swarm, Docker Compose’s <code>secrets:</code> section does not change a file’s owner or mode, so mount the file as shown above.</p>
+
+      <h2>Change the secret: <code>trust rotate</code></h2>
+      <pre class="cmd"><code>memex-mcp trust rotate</code></pre>
+      <p>The command makes a new secret, signs every file that verifies under the old secret again with the new one, and replaces the secret file in one step. Restart the server afterwards; a running server does not pick up the new secret by itself.</p>
+      <ul>
+        <li><strong>If it stops half-way,</strong> the new secret waits in <code>trust.secret.next</code>, and <code>trust status</code> and the server’s start-up say “rotation incomplete — run <code>memex-mcp trust rotate</code>”. Run the command again: it carries on from where it stopped.</li>
+        <li><strong>If no file verifies</strong> (for example the secret file came from another install), the command stops and changes nothing. To replace the secret anyway, add <code>--force</code>. Files that do not verify stay as they are, and the server keeps rejecting them.</li>
+        <li>If you have lost the secret, <code>rotate</code> cannot help (it has to read the old one); use <code>trust reset</code>. It only runs when the secret file is missing or verifies no file. First run <code>memex-mcp trust reset</code>: it shows what will happen and changes nothing. If you agree, run <code>memex-mcp trust reset --yes</code> (add <code>--secret-file &lt;path&gt;</code> for a different secret path). The command:
+          <ul>
+            <li>Revokes all access keys and keeps a backup of <code>tokens.json</code>. Mint a new admin key and reconnect your AI tools: <code>memex-mcp token mint --kind admin --trust-secret-file &lt;path&gt;</code></li>
+            <li>Sets clouds and rules aside, not deleted. Decide each with <code>memex-mcp trust held list</code>, <code>keep</code> and <code>remove</code>.</li>
+            <li>Creates a new secret and signs everything with it. The old secret file is kept as <code>&lt;secret&gt;.lost-&lt;number&gt;</code>; delete it once you are sure it is lost.</li>
+            <li>Restart the server with the new secret.</li>
+          </ul></li>
+      </ul>
+
+      <h2>See where you stand: <code>trust status</code></h2>
+      <pre class="cmd"><code>memex-mcp trust status</code></pre>
+      <pre class="cmd"><code>Trust secret file: /var/lib/memex-mcp/trust.secret
+  present, permissions ok
+Trust files:
+  tokens.json        signed (verified)  mode 0600
+  remotes.json       signed (verified)  mode 0600
+  policy.yaml        signed (verified)  mode 0600</code></pre>
+      <p>It shows whether each file’s signature verifies, the file modes and the secret file’s permissions. It never prints the secret. The exit code is 0 when everything verifies and 1 otherwise. For a running server, the <code>"trust"</code> field of <code>GET /health</code> tells you the same: <code>signed</code> is protected, <code>unsigned</code> is not.</p>
+
+      <div class="actions">
+        <a class="btn" href="../../report/">Report a problem</a>
+        <a class="quiet" href="../../">memex</a>
+      </div>
+    </div>
+  </div>
+</main>
+<footer><span>© m-rex-agent</span><a href="../../">memex</a></footer>
+<script>
+(function () {
+  var d = document.documentElement;
+  var titles = { tr: "Erişim anahtarlarını koru — memex", en: "Protect your access keys — memex" };
+  function apply(l) {
+    d.setAttribute("data-lang", l); d.lang = l; document.title = titles[l];
+    document.querySelectorAll(".langsw button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.set === l)); });
+  }
+  document.querySelectorAll(".langsw button").forEach(function (b) { b.addEventListener("click", function () { apply(b.dataset.set); }); });
+  apply(d.getAttribute("data-lang") || "en");
+})();
+</script>
+</body></html>
